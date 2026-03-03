@@ -1,313 +1,240 @@
-<p align="center">
-  <a href="https://github.com/marketplace/actions/deploy-to-github-pages">
-    <img alt="GitHub Pages Deploy Action Logo" width="200px" src="https://github.com/JamesIves/github-pages-deploy-action/raw/dev/.github/docs/icon.png">
-  </a>
-</p>
-
-<h1 align="center">
-  GitHub Pages Deploy Action :rocket:
-</h1>
-
-<p align="center">
-  Automatically deploy your project to <a href="https://pages.github.com/">GitHub Pages</a> with <a href="https://github.com/features/actions">GitHub Actions</a>. This action can be configured to push your production-ready code into any branch you'd like, including <b>gh-pages</b> and <b>docs</b>. It can also handle cross repository deployments and works with <a href="https://github.com/enterprise">GitHub Enterprise</a> too.
-</p>
-
-<p align="center">
-  <img src="https://github.com/JamesIves/github-pages-deploy-action/raw/dev/.github/docs/screenshot.png" alt="">
-</p>
-
-<p align="center">
-Maintenance of this project is made possible by all the <a href="https://github.com/JamesIves/github-pages-deploy-action/graphs/contributors">contributors</a> and <a href="https://github.com/sponsors/JamesIves">sponsors</a>. If you'd like to sponsor this project and have your avatar or company logo appear below <a href="https://github.com/sponsors/JamesIves">click here</a>. 💖
-</p>
-
-<p align="center">
-<!-- premium --><a href="https://github.com/github"><img src="https://github.com/github.png" width="80px" alt="github" /></a>&nbsp;&nbsp;<a href="https://github.com/annegentle"><img src="https://github.com/annegentle.png" width="80px" alt="annegentle" /></a>&nbsp;&nbsp;<a href="https://github.com/tonjohn"><img src="https://github.com/tonjohn.png" width="80px" alt="tonjohn" /></a>&nbsp;&nbsp;<a href="https://github.com/Zhenglei-BCS"><img src="https://github.com/Zhenglei-BCS.png" width="80px" alt="Zhenglei-BCS" /></a>&nbsp;&nbsp;<a href="https://github.com/"><img src="https://github.com/.png" width="80px" alt="" /></a>&nbsp;&nbsp;<!-- premium -->
-</p>
-
-<p align="center">
-<!-- sponsors --><a href="https://github.com/Chooksta69"><img src="https://github.com/Chooksta69.png" width="50px" alt="Chooksta69" /></a>&nbsp;&nbsp;<a href="https://github.com/MattWillFlood"><img src="https://github.com/MattWillFlood.png" width="50px" alt="MattWillFlood" /></a>&nbsp;&nbsp;<a href="https://github.com/jonathan-milan-pollock"><img src="https://github.com/jonathan-milan-pollock.png" width="50px" alt="jonathan-milan-pollock" /></a>&nbsp;&nbsp;<a href="https://github.com/raoulvdberge"><img src="https://github.com/raoulvdberge.png" width="50px" alt="raoulvdberge" /></a>&nbsp;&nbsp;<a href="https://github.com/robjtede"><img src="https://github.com/robjtede.png" width="50px" alt="robjtede" /></a>&nbsp;&nbsp;<a href="https://github.com/hadley"><img src="https://github.com/hadley.png" width="50px" alt="hadley" /></a>&nbsp;&nbsp;<a href="https://github.com/kevinchalet"><img src="https://github.com/kevinchalet.png" width="50px" alt="kevinchalet" /></a>&nbsp;&nbsp;<a href="https://github.com/Yousazoe"><img src="https://github.com/Yousazoe.png" width="50px" alt="Yousazoe" /></a>&nbsp;&nbsp;<a href="https://github.com/planetoftheweb"><img src="https://github.com/planetoftheweb.png" width="50px" alt="planetoftheweb" /></a>&nbsp;&nbsp;<a href="https://github.com/melton1968"><img src="https://github.com/melton1968.png" width="50px" alt="melton1968" /></a>&nbsp;&nbsp;<a href="https://github.com/szepeviktor"><img src="https://github.com/szepeviktor.png" width="50px" alt="szepeviktor" /></a>&nbsp;&nbsp;<a href="https://github.com/sckott"><img src="https://github.com/sckott.png" width="50px" alt="sckott" /></a>&nbsp;&nbsp;<a href="https://github.com/provinzkraut"><img src="https://github.com/provinzkraut.png" width="50px" alt="provinzkraut" /></a>&nbsp;&nbsp;<a href="https://github.com/electrovir"><img src="https://github.com/electrovir.png" width="50px" alt="electrovir" /></a>&nbsp;&nbsp;<a href="https://github.com/Griefed"><img src="https://github.com/Griefed.png" width="50px" alt="Griefed" /></a>&nbsp;&nbsp;<a href="https://github.com/MontezumaIves"><img src="https://github.com/MontezumaIves.png" width="50px" alt="MontezumaIves" /></a>&nbsp;&nbsp;<a href="https://github.com/wylie"><img src="https://github.com/wylie.png" width="50px" alt="wylie" /></a>&nbsp;&nbsp;<a href="https://github.com/pylapp"><img src="https://github.com/pylapp.png" width="50px" alt="pylapp" /></a>&nbsp;&nbsp;<a href="https://github.com/leoxeno"><img src="https://github.com/leoxeno.png" width="50px" alt="leoxeno" /></a>&nbsp;&nbsp;<a href="https://github.com/"><img src="https://github.com/.png" width="50px" alt="" /></a>&nbsp;&nbsp;<a href="https://github.com/"><img src="https://github.com/.png" width="50px" alt="" /></a>&nbsp;&nbsp;<!-- sponsors -->
-</p>
-
-## Getting Started :airplane:
-
-You can include the action in your workflow to trigger on any event that [GitHub actions supports](https://help.github.com/en/articles/events-that-trigger-workflows). If the remote branch that you wish to deploy to doesn't already exist the action will create it for you. Your workflow will also need to include the `actions/checkout` step before this workflow runs in order for the deployment to work. If you intend to make multiple deployments in quick succession [you may need to leverage the concurrency parameter in your workflow](https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#concurrency) to prevent overlaps.
-
-You can view an example of this below.
-
-```yml
-name: Build and Deploy
-on: [push]
-permissions:
-  contents: write
-jobs:
-  build-and-deploy:
-    concurrency: ci-${{ github.ref }} # Recommended if you intend to make multiple deployments in quick succession.
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v6
-
-      - name: Install and Build 🔧 # This example project is built using npm and outputs the result to the 'build' folder. Replace with the commands required to build your project, or remove this step entirely if your site is pre-built.
-        run: |
-          npm ci
-          npm run build
-
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: build # The folder the action should deploy.
-```
-
-> [!NOTE]
-> You must configure your repository to deploy from the branch you push to. To do this, go to your repository settings, click on `Pages`, and choose `Deploy from a Branch` from the `Source` dropdown. From there select the branch you supplied to the action. In most cases this will be `gh-pages` as that's the default.
-
-If you'd like to make it so the workflow only triggers on push events to specific branches then you can modify the `on` section.
-
-```yml
-on:
-  push:
-    branches:
-      - main
-```
-
-> [!WARNING]
-> If you do not supply the action with an access token or an SSH key, you must access your repositories settings and provide `Read and Write Permissions` to the provided `GITHUB_TOKEN`, otherwise you'll potentially run into permission issues. Alternatively you can set the following in your workflow file to grant the action the permissions it needs.
-
-```yml
-permissions:
-  contents: write
-```
-
-## Configuration 📁
-
-The `with` portion of the workflow **must** be configured before the action will work. You can add these in the `with` section found in the examples above. Any `secrets` must be referenced using the bracket syntax and stored in the GitHub repository's `Settings/Secrets` menu. You can learn more about setting environment variables with GitHub actions [here](https://help.github.com/en/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets#creating-encrypted-secrets).
-
-#### Required Setup
-
-The following options must be configured in order to make a deployment.
-
-| Key      | Value Information                                                                                                                                                                                                                                                                                                                                                                                                                        | Type   | Required |
-| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
-| `folder` | The folder in your repository that you want to deploy. If your build script compiles into a directory named `build` you'd put it here. If you wish to deploy the root directory you can place a `.` here. You can also utilize absolute file paths by prepending `~` to your folder path. Note that any files/folders matching `.gitignore` entries will not be deployed. Some tools auto-generate a `.gitignore` file for build output. | `with` | **Yes**  |
-
-By default, the action does not need any token configuration and uses the provided repository scoped GitHub token to make the deployment. If you require more customization you can modify the deployment type using the following options.
-
-| Key       | Value Information                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Type   | Required |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
-| `token`   | This option defaults to the repository scoped GitHub Token. However, if you need more permissions for things such as deploying to another repository, you can add a Personal Access Token (PAT) here. This should be stored in the `secrets / with` menu **as a secret**. We recommend using a service account with the least permissions necessary and recommend when generating a new PAT that you select the least permission scopes necessary. [Learn more about creating and using encrypted secrets here.](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets) | `with` | **No**   |
-| `ssh-key` | You can configure the action to deploy using SSH by setting this option to a private SSH key stored **as a secret**. It can also be set to `true` to use an existing SSH client configuration. For more detailed information on how to add your public/private ssh key pair please refer to the [Using a Deploy Key section of this README](https://github.com/JamesIves/github-pages-deploy-action/tree/dev#using-an-ssh-deploy-key-).                                                                                                                                                                                                | `with` | **No**   |
-
-#### Optional Choices
-
-| Key                | Value Information                                                                                                                                                                                                                                                                                                                                                                                                    | Type   | Required |
-| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | -------- |
-| `branch`           | This is the branch you wish to deploy to, for example, `gh-pages` or `docs`. Defaults to `gh-pages`.                                                                                                                                                                                                                                                                                                                 | `with` | **No**   |
-| `git-config-name`  | Allows you to customize the name that is attached to the git config which is used when pushing the deployment commits. If this is not included it will use the name in the GitHub context, followed by the name of the action.                                                                                                                                                                                       | `with` | **No**   |
-| `git-config-email` | Allows you to customize the email that is attached to the git config which is used when pushing the deployment commits. If this is not included it will use the email in the GitHub context, followed by a generic noreply GitHub email. You can include `<>` for the value if you wish to omit this field altogether and push the commits without an email.                                                         | `with` | **No**   |
-| `repository-name`  | Allows you to specify a different repository path so long as you have permissions to push to it. This should be formatted like so: `JamesIves/github-pages-deploy-action`. You'll need to use a PAT in the `token` input for this configuration option to work properly. **When using `actions/checkout`, you must also set `persist-credentials: false` in the checkout step to prevent authentication conflicts.** | `with` | **No**   |
-| `target-folder`    | If you'd like to push the contents of the deployment folder into a specific directory on the deployment branch you can specify it here.                                                                                                                                                                                                                                                                              | `with` | **No**   |
-| `commit-message`   | If you need to customize the commit message for an integration you can do so.                                                                                                                                                                                                                                                                                                                                        | `with` | **No**   |
-| `clean`            | You can use this option to delete files from your deployment destination that no longer exist in your deployment source. One use case is if your project generates hashed files that vary from build to build. Using `clean` will not affect `.git`, `.github`, or `.ssh` directories. This option is turned on by default and can be toggled off by setting it to `false`.                                          | `with` | **No**   |
-| `clean-exclude`    | If you need to use `clean` but you'd like to preserve certain files or folders you can use this option. This should contain each pattern as a single line in a multiline string.                                                                                                                                                                                                                                     | `with` | **No**   |
-| `dry-run`          | Do not actually push back, but use `--dry-run` on `git push` invocations instead.                                                                                                                                                                                                                                                                                                                                    | `with` | **No**   |
-| `single-commit`    | This option can be toggled to `true` if you'd prefer to have a single commit on the deployment branch instead of maintaining the full history. **Using this option will also cause any existing history to be wiped from the deployment branch**.                                                                                                                                                                    | `with` | **No**   |
-| `force`            | Force-push new deployments to overwrite the previous version; otherwise, attempt to rebase new deployments onto any existing ones. This option is turned on by default and can be toggled off by setting it to `false`, which may be useful if there are multiple deployments in a single branch.                                                                                                                    | `with` | **No**   |
-| `attempt-limit`    | How many rebase attempts to make before suspending the job. This option defaults to `3` and may be useful to increase when there are multiple deployments in a single branch.                                                                                                                                                                                                                                        | `with` | **No**   |
-| `silent`           | Silences the action output preventing it from displaying git messages.                                                                                                                                                                                                                                                                                                                                               | `with` | **No**   |
-| `tag`              | Add a tag to the commit. Only works when `dry-run` is not used.                                                                                                                                                                                                                                                                                                                                                      | `with` | **No**   |
-
-With the action correctly configured you should see the workflow trigger the deployment under the configured conditions.
-
-#### Deployment Status
-
-The action will export an environment variable called `deployment_status` that you can use in your workflow to determine if the deployment was successful or not. You can find an explanation of each status type below.
-
-| Status    | Description                                                                                     |
-| --------- | ----------------------------------------------------------------------------------------------- |
-| `success` | The `success` status indicates that the action was able to successfully deploy to the branch.   |
-| `failed`  | The `failed` status indicates that the action encountered an error while trying to deploy.      |
-| `skipped` | The `skipped` status indicates that the action exited early as there was nothing new to deploy. |
-
-This value is also set as a step output as `deployment-status`.
-
----
-
-### Using an SSH Deploy Key 🔑
-
-If you'd prefer to use an SSH deploy key as opposed to a token you must first generate a new SSH key by running the following terminal command, replacing the email with one connected to your GitHub account.
-
-```bash
-ssh-keygen -t rsa -m pem -b 4096 -C "youremailhere@example.com" -N ""
-```
-
-Once you've generated the key pair you must add the contents of the public key within your repository's [deploy keys menu](https://developer.github.com/v3/guides/managing-deploy-keys/). You can find this option by going to `Settings > Deploy Keys`, you can name the public key whatever you want, but you **do** need to give it write access. Afterwards, add the contents of the private key to the `Settings > Secrets` menu as `DEPLOY_KEY`.
-
-With this configured, you can then set the `ssh-key` part of the action to your private key stored as a secret.
-
-```yml
-- name: Deploy 🚀
-  uses: JamesIves/github-pages-deploy-action@v4
-  with:
-    folder: site
-    ssh-key: ${{ secrets.DEPLOY_KEY }}
-```
-
-<details><summary>You can view a full example of this here.</summary>
-<p>
-
-```yml
-name: Build and Deploy
-on:
-  push:
-    branches:
-      - main
-jobs:
-  deploy:
-    concurrency: ci-${{ github.ref }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v6
-
-      - name: Install and Build 🔧 # This example project is built using npm and outputs the result to the 'build' folder. Replace with the commands required to build your project, or remove this step entirely if your site is pre-built.
-        run: |
-          npm ci
-          npm run build
-
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: build
-          clean: true
-          clean-exclude: |
-            special-file.txt
-            some/*.txt
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
-```
-
-</p>
-</details>
-
-Alternatively, if you've already configured the SSH client within a previous step you can set the `ssh-key` option to `true` to allow it to deploy using an existing SSH client. Instead of adjusting the client configuration, it will simply switch to using GitHub's SSH endpoints.
-
----
-
-### Operating System Support 💿
-
-This action is primarily developed using [Ubuntu](https://ubuntu.com/). [In your workflow job configuration](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions#jobsjob_idruns-on) it's recommended to set the `runs-on` property to `ubuntu-latest`.
-
-```yml
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-```
-
-If you're using an operating system such as [Windows](https://www.microsoft.com/en-us/windows/) you can workaround this using [artifacts](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/persisting-workflow-data-using-artifacts). In your workflow configuration you can utilize the `actions/upload-artifact` and `actions/download-artifact` actions to move your project built on a Windows job to a secondary job that will handle the deployment.
-
-<details><summary>You can view an example of this pattern here.</summary>
-<p>
-
-```yml
-name: Build and Deploy
-on: [push]
-permissions:
-  contents: write
-jobs:
-  build:
-    runs-on: windows-latest # The first job utilizes windows-latest
-    steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v6
-
-      - name: Install and Build 🔧 # This example project is built using npm and outputs the result to the 'build' folder. Replace with the commands required to build your project, or remove this step entirely if your site is pre-built.
-        run: |
-          npm ci
-          npm run build
-
-      - name: Upload Artifacts 🔺 # The project is then uploaded as an artifact named 'site'.
-        uses: actions/upload-artifact@v1
-        with:
-          name: site
-          path: build
-
-  deploy:
-    concurrency: ci-${{ github.ref }}
-    needs: [build] # The second job must depend on the first one to complete before running and uses ubuntu-latest instead of windows.
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v6
-
-      - name: Download Artifacts 🔻 # The built project is downloaded into the 'site' folder.
-        uses: actions/download-artifact@v1
-        with:
-          name: site
-
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: 'site' # The deployment folder should match the name of the artifact. Even though our project builds into the 'build' folder the artifact name of 'site' must be placed here.
-```
-
-</p>
-</details>
-
----
-
-### Using a Container 🚢
-
-If you use a [container](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions#jobsjob_idcontainer) in your workflow you may need to run an additional step to install `rsync` as this action depends on it. You can view an example of this below.
-
-```yml
-- name: Install rsync 📚
-  run: |
-    apt-get update && apt-get install -y rsync
-
-- name: Deploy 🚀
-  uses: JamesIves/github-pages-deploy-action@v4
-```
-
----
-
-### Additional Build Files 📁
-
-If you're using a custom domain and require a `CNAME` file, or if you require the use of a `.nojekyll` file, you can safely commit these files directly into the deployment branch without them being overridden after each deployment, additionally, you can include these files in your deployment folder to update them. If you need to add additional files to the deployment that should be ignored by the build clean-up steps you can utilize the `clean-exclude` option.
-
-<details><summary>Click here to view an example of this.</summary>
-<p>
-
-```yml
-name: Build and Deploy
-permissions:
-  contents: write
-on:
-  push:
-    branches:
-      - main
-jobs:
-  deploy:
-    concurrency: ci-${{ github.ref }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout 🛎️
-        uses: actions/checkout@v6
-
-      - name: Install and Build 🔧 # This example project is built using npm and outputs the result to the 'build' folder. Replace with the commands required to build your project, or remove this step entirely if your site is pre-built.
-        run: |
-          npm ci
-          npm run build
-
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: build
-          clean: true
-          clean-exclude: |
-            special-file.txt
-            some/*.txt
-```
-
-</p>
-</details>
-
-If you wish to remove these files you must go into the deployment branch directly to remove them. This is to prevent accidental changes in your deployment script from creating breaking changes.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MANIVERSE Store</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+body{background:#f4f6f9;color:#222}
+header{background:#111;color:#fff;padding:20px;text-align:center}
+header h1{font-size:28px}
+header p{font-size:14px;color:#ccc}
+
+.hero img{width:100%;height:250px;object-fit:cover}
+
+.categories{display:flex;overflow-x:auto;padding:10px;background:#fff;gap:10px}
+.categories button{
+padding:8px 15px;border:none;border-radius:20px;
+background:#e5e7eb;cursor:pointer;white-space:nowrap
+}
+.categories button.active{background:#111;color:#fff}
+
+.products{
+display:grid;
+grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+gap:15px;
+padding:15px;
+}
+.product{
+background:#fff;border-radius:12px;padding:10px;
+box-shadow:0 4px 10px rgba(0,0,0,0.05);
+transition:0.3s;
+}
+.product:hover{transform:translateY(-5px)}
+.product img{
+width:100%;height:150px;object-fit:cover;border-radius:10px
+}
+.product h3{font-size:14px;margin:5px 0}
+.product p{font-size:12px;color:#555}
+.product .price{font-weight:600;margin:5px 0}
+.product button{
+width:100%;padding:6px;border:none;
+background:#111;color:#fff;border-radius:6px;cursor:pointer
+}
+
+.cart-icon{
+position:fixed;bottom:20px;right:20px;
+background:#111;color:#fff;padding:12px 15px;
+border-radius:50px;cursor:pointer;
+}
+.cart-count{
+background:red;color:#fff;
+padding:2px 6px;border-radius:50%;font-size:12px;margin-left:5px
+}
+
+.cart{
+position:fixed;right:-100%;top:0;width:100%;max-width:400px;
+height:100%;background:#fff;box-shadow:-5px 0 20px rgba(0,0,0,0.2);
+transition:0.3s;padding:20px;overflow-y:auto
+}
+.cart.active{right:0}
+.cart h2{margin-bottom:10px}
+.cart-item{display:flex;justify-content:space-between;margin:10px 0}
+.cart-item button{padding:2px 6px;margin:0 2px}
+
+.checkout-form input, .checkout-form textarea{
+width:100%;padding:8px;margin:5px 0;border:1px solid #ccc;border-radius:6px
+}
+.checkout-form button{
+width:100%;padding:10px;margin-top:10px;
+background:#111;color:#fff;border:none;border-radius:6px
+}
+
+.whatsapp{
+position:fixed;bottom:20px;left:20px;
+background:#25D366;color:#fff;padding:10px 15px;
+border-radius:50px;text-decoration:none;font-size:14px
+}
+.confirmation{
+background:#d1fae5;padding:10px;margin-top:10px;border-radius:6px
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>MANIVERSE Store</h1>
+<p>SYSTUMM FAAD DO • FATEHPUR, UP</p>
+</header>
+
+<div class="hero">
+<img src="https://i.ibb.co/YTPG30XL/interior-clothing-store-with-stylish-merchandise-racks-fashionable-brand-design-casual-wear-modern-b.jpg" loading="lazy" alt="MANIVERSE Store interior">
+</div>
+
+<div class="categories" id="categoryButtons"></div>
+
+<div class="products" id="productList"></div>
+
+<div class="cart-icon" onclick="toggleCart()">
+🛒 <span class="cart-count" id="cartCount">0</span>
+</div>
+
+<div class="cart" id="cart">
+<h2>Your Cart</h2>
+<div id="cartItems"></div>
+<h3 id="grandTotal"></h3>
+
+<form class="checkout-form" id="orderForm" action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST">
+<input type="hidden" name="order_summary" id="orderSummary">
+<input type="text" name="Customer Name" placeholder="Your Name" required>
+<input type="tel" name="Phone Number" placeholder="Phone Number" required>
+<textarea name="Delivery Address" placeholder="Delivery Address" required></textarea>
+<textarea name="Special Instructions" placeholder="Any special instructions"></textarea>
+<button type="submit">Place Order</button>
+</form>
+
+<div id="confirmation"></div>
+</div>
+
+<a class="whatsapp" href="https://wa.me/919984121131" target="_blank">Chat on WhatsApp</a>
+
+<script>
+
+const products = [
+{ id:1, name:"Cars (6)", price:280, category:"toys", img:"https://i.ibb.co/Xxm8SkfT/C5-FA7-D4-B-3-CB4-4-D55-9-AE7-78-FC039-C1811.jpg", desc:"Premium toy cars set" },
+{ id:2, name:"Shoes (4 pair)", price:1000, category:"menswear", img:"https://i.ibb.co/cSKNxXvw/0-D4-BA739-0032-415-A-9382-993-EEA0449-C7.jpg", desc:"Comfortable stylish shoes" },
+{ id:3, name:"T-Shirt Combo", price:499, category:"menswear", img:"https://i.ibb.co/B5K58kpt/IMG-7092.png", desc:"Soft cotton combo pack" },
+{ id:4, name:"Jeans", price:799, category:"menswear", img:"https://i.ibb.co/B5K58kpt/IMG-7092.png", desc:"Slim fit denim" },
+{ id:5, name:"Kids Toy Truck", price:350, category:"toys", img:"https://i.ibb.co/Xxm8SkfT/C5-FA7-D4-B-3-CB4-4-D55-9-AE7-78-FC039-C1811.jpg", desc:"Durable toy truck" },
+{ id:6, name:"Sports Shoes", price:1200, category:"menswear", img:"https://i.ibb.co/cSKNxXvw/0-D4-BA739-0032-415-A-9382-993-EEA0449-C7.jpg", desc:"Running shoes" },
+{ id:7, name:"Formal Shirt", price:650, category:"menswear", img:"https://i.ibb.co/B5K58kpt/IMG-7092.png", desc:"Premium cotton shirt" },
+{ id:8, name:"Toy Bike", price:400, category:"toys", img:"https://i.ibb.co/Xxm8SkfT/C5-FA7-D4-B-3-CB4-4-D55-9-AE7-78-FC039-C1811.jpg", desc:"Stylish toy bike" }
+];
+
+let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+function saveCart(){
+localStorage.setItem("cart",JSON.stringify(cart));
+updateCart();
+}
+
+function addToCart(id){
+const item = cart.find(p=>p.id===id);
+if(item){item.qty++}
+else{
+const product = products.find(p=>p.id===id);
+cart.push({...product, qty:1});
+}
+saveCart();
+}
+
+function updateCart(){
+document.getElementById("cartCount").innerText = cart.reduce((a,b)=>a+b.qty,0);
+const cartItems = document.getElementById("cartItems");
+cartItems.innerHTML="";
+let total=0;
+cart.forEach(item=>{
+total+=item.price*item.qty;
+cartItems.innerHTML+=`
+<div class="cart-item">
+<div>
+<strong>${item.name}</strong><br>
+₹${item.price} x ${item.qty}
+</div>
+<div>
+<button onclick="changeQty(${item.id},-1)">-</button>
+<button onclick="changeQty(${item.id},1)">+</button>
+<button onclick="removeItem(${item.id})">x</button>
+</div>
+</div>`;
+});
+document.getElementById("grandTotal").innerText="Total: ₹"+total;
+document.getElementById("orderSummary").value=
+cart.map(i=>`${i.name} | Qty: ${i.qty} | ₹${i.price*i.qty}`).join("\n")
++"\nTotal: ₹"+total;
+}
+
+function changeQty(id,delta){
+const item = cart.find(p=>p.id===id);
+item.qty+=delta;
+if(item.qty<=0) cart=cart.filter(p=>p.id!==id);
+saveCart();
+}
+function removeItem(id){
+cart=cart.filter(p=>p.id!==id);
+saveCart();
+}
+
+function toggleCart(){
+document.getElementById("cart").classList.toggle("active");
+}
+
+function renderProducts(filter="all"){
+const list=document.getElementById("productList");
+list.innerHTML="";
+products.filter(p=>filter==="all"||p.category===filter)
+.forEach(p=>{
+list.innerHTML+=`
+<div class="product">
+<img src="${p.img}" loading="lazy" alt="${p.name}">
+<h3>${p.name}</h3>
+<p>${p.desc}</p>
+<div class="price">₹${p.price}</div>
+<button onclick="addToCart(${p.id})">Add to Cart</button>
+</div>`;
+});
+}
+
+function renderCategories(){
+const categories=["all",...new Set(products.map(p=>p.category))];
+const container=document.getElementById("categoryButtons");
+categories.forEach(cat=>{
+const btn=document.createElement("button");
+btn.innerText=cat;
+btn.onclick=()=>{renderProducts(cat)};
+container.appendChild(btn);
+});
+}
+
+document.getElementById("orderForm").addEventListener("submit",function(){
+setTimeout(()=>{
+cart=[];
+saveCart();
+document.getElementById("confirmation").innerHTML=
+'<div class="confirmation">Order placed! MANIVERSE Store will contact you on WhatsApp to confirm.</div>';
+},1000);
+});
+
+renderCategories();
+renderProducts();
+updateCart();
+
+</script>
+
+</body>
+</html>
